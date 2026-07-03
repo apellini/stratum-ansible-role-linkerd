@@ -1,0 +1,23 @@
+---
+argument_specs:
+  main:
+    short_description: Install Linkerd service mesh and configure namespace mTLS injection
+    description: >
+      Downloads and installs the Linkerd CLI at the pinned version.
+      Applies CRDs then the control plane via kubectl.
+      Waits for linkerd check to pass.
+      Annotates specified namespaces with linkerd.io/inject=enabled for automatic mTLS (D-ENV-13).
+    options:
+      linkerd_version:
+        type: str
+        required: true
+        description: >
+          Linkerd release tag to install (e.g. stable-2.14.10).
+          Used to download the CLI binary from github.com/linkerd/linkerd2/releases.
+      linkerd_inject_namespaces:
+        type: list
+        required: true
+        elements: str
+        description: >
+          Kubernetes namespace names to annotate with linkerd.io/inject=enabled.
+          Enables automatic mTLS for all pods deployed in those namespaces.

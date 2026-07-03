@@ -1,0 +1,19 @@
+---
+galaxy_info:
+  role_name: linkerd
+  author: apellini
+  description: Install Linkerd service mesh and configure namespace mTLS injection
+  license: MIT
+  min_ansible_version: "2.16"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+        - noble
+  galaxy_tags:
+    - kubernetes
+    - linkerd
+    - servicemesh
+    - mtls
+    - stratum
+dependencies: []

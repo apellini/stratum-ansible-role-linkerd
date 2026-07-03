@@ -1,0 +1,48 @@
+---
+- name: Download linkerd CLI (idempotent -- skipped if file exists)
+  ansible.builtin.get_url:
+    url: "https://github.com/linkerd/linkerd2/releases/download/{{ linkerd_version }}/linkerd2-cli-{{ linkerd_version }}-linux-amd64"
+    dest: /usr/local/bin/linkerd
+    mode: "0755"
+    force: false
+
+- name: Apply Linkerd CRDs
+  ansible.builtin.shell:
+    cmd: linkerd install --crds | kubectl apply -f -
+    executable: /bin/bash
+  register: _linkerd_crds
+  changed_when: "'unchanged' not in _linkerd_crds.stdout"
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+
+- name: Apply Linkerd control plane
+  ansible.builtin.shell:
+    cmd: linkerd install | kubectl apply -f -
+    executable: /bin/bash
+  register: _linkerd_cp
+  changed_when: "'unchanged' not in _linkerd_cp.stdout"
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+
+- name: Wait for Linkerd control plane health check
+  ansible.builtin.command:
+    cmd: linkerd check
+  register: _linkerd_check
+  retries: 12
+  delay: 15
+  until: _linkerd_check.rc == 0
+  changed_when: false
+  environment:
+    KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+
+- name: Annotate namespaces for Linkerd automatic mTLS injection
+  kubernetes.core.k8s:
+    kubeconfig: /etc/rancher/k3s/k3s.yaml
+    state: patched
+    kind: Namespace
+    name: "{{ item }}"
+    definition:
+      metadata:
+        annotations:
+          linkerd.io/inject: enabled
+  loop: "{{ linkerd_inject_namespaces }}"
