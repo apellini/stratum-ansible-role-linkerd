@@ -8,7 +8,7 @@
 
 - name: Apply Linkerd CRDs
   ansible.builtin.shell:
-    cmd: linkerd install --crds | kubectl apply -f -
+    cmd: set -o pipefail && linkerd install --crds | kubectl apply -f -
     executable: /bin/bash
   register: _linkerd_crds
   changed_when: "'unchanged' not in _linkerd_crds.stdout"
@@ -17,7 +17,7 @@
 
 - name: Apply Linkerd control plane
   ansible.builtin.shell:
-    cmd: linkerd install | kubectl apply -f -
+    cmd: set -o pipefail && linkerd install | kubectl apply -f -
     executable: /bin/bash
   register: _linkerd_cp
   changed_when: "'unchanged' not in _linkerd_cp.stdout"
