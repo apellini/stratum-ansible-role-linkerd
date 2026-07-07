@@ -13,6 +13,7 @@
   register: _linkerd_crds
   changed_when: "'unchanged' not in _linkerd_crds.stdout"
   environment:
+    PATH: /usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
     KUBECONFIG: /etc/rancher/k3s/k3s.yaml
 
 - name: Apply Linkerd control plane
@@ -22,6 +23,7 @@
   register: _linkerd_cp
   changed_when: "'unchanged' not in _linkerd_cp.stdout"
   environment:
+    PATH: /usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
     KUBECONFIG: /etc/rancher/k3s/k3s.yaml
 
 - name: Wait for Linkerd control plane health check
@@ -33,6 +35,7 @@
   until: _linkerd_check.rc == 0
   changed_when: false
   environment:
+    PATH: /usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
     KUBECONFIG: /etc/rancher/k3s/k3s.yaml
 
 - name: Annotate namespaces for Linkerd automatic mTLS injection
